@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Monroe Build Hub</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:#0f1a13;color:#e8f0eb;font-family:'Segoe UI',system-ui,sans-serif;max-width:430px;margin:0 auto;min-height:100vh;overflow-x:hidden;}
+  .screen{display:none;padding-bottom:90px;min-height:100vh;}
+  .screen.active{display:block;}
+
+  /* TAB BAR */
+  .tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;background:#131f16;border-top:1px solid #2C3E50;display:flex;justify-content:space-around;align-items:center;padding:6px 0 10px;z-index:999;}
+  .tab{background:none;border:none;color:#6a8c72;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;padding:4px 8px;border-radius:10px;transition:all 0.2s;}
+  .tab.tabon{color:#E67E22;}
+  .tab-icon{font-size:20px;line-height:1;}
+  .tab-label{font-size:10px;font-weight:600;letter-spacing:0.3px;}
+
+  /* HEADERS */
+  .top-bar{background:linear-gradient(135deg,#1a2e20,#2C3E50);padding:18px 20px 16px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;border-bottom:2px solid #E67E22;}
+  .wordmark{font-size:20px;font-weight:800;letter-spacing:-0.5px;color:#fff;}
+  .wordmark span{color:#E67E22;}
+  .top-bar-sub{font-size:11px;color:#8ab89a;font-weight:500;}
+  .notif-btn{background:#2C3E50;border:none;color:#E67E22;font-size:18px;width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+
+  /* HERO */
+  .hero{background:linear-gradient(160deg,#1e3a25,#2C3E50);margin:16px;border-radius:20px;padding:24px 20px;border:1px solid #2e4a35;position:relative;overflow:hidden;}
+  .hero::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:rgba(230,126,34,0.12);border-radius:50%;}
+  .hero-tag{background:#E67E22;color:#fff;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:10px;letter-spacing:1px;text-transform:uppercase;}
+  .hero h2{font-size:22px;font-weight:800;line-height:1.3;margin-bottom:8px;}
+  .hero p{font-size:13px;color:#9dbfa8;line-height:1.5;margin-bottom:18px;}
+  .btn-primary{background:#E67E22;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:14px;font-weight:700;cursor:pointer;display:inline-block;transition:opacity 0.2s;}
+  .btn-primary:active{opacity:0.8;}
+  .btn-secondary{background:transparent;color:#E67E22;border:2px solid #E67E22;padding:10px 20px;border-radius:12px;font-size:13px;font-weight:700;cursor:pointer;transition:all 0.2s;}
+  .btn-secondary:active{background:#E67E22;color:#fff;}
+
+  /* SECTION TITLES */
+  .section-title{font-size:16px;font-weight:700;color:#e8f0eb;margin:20px 16px 10px;display:flex;align-items:center;justify-content:space-between;}
+  .section-title span{font-size:12px;color:#E67E22;font-weight:600;cursor:pointer;}
+
+  /* CARDS */
+  .card{background:#1a2e1e;border:1px solid #2e4835;border-radius:16px;padding:16px;margin:0 16px 12px;}
+  .card-row{display:flex;gap:10px;margin:0 16px 12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+  .card-row::-webkit-scrollbar{display:none;}
+  .mini-card{background:#1a2e1e;border:1px solid #2e4835;border-radius:14px;padding:14px 12px;min-width:130px;flex-shrink:0;cursor:pointer;transition:all 0.2s;}
+  .mini-card:active{border-color:#E67E22;transform:scale(0.97);}
+  .mini-card-icon{font-size:26px;margin-bottom:8px;}
+  .mini-card-title{font-size:12px;font-weight:700;color:#e8f0eb;margin-bottom:4px;}
+  .mini-card-sub{font-size:11px;color:#6a8c72;}
+
+  /* SERVICE ITEMS */
+  .service-item{display:flex;align-items:center;gap:14px;background:#1a2e1e;border:1px solid #2e4835;border-radius:14px;padding:14px;margin:0 16px 10px;cursor:pointer;transition:all 0.2s;}
+  .service-item:active{border-color:#E67E22;}
+  .service-icon{width:48px;height:48px;background:linear-gradient(135deg,#2C3E50,#1a2e20);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .service-info{flex:1;}
+  .service-name{font-size:14px;font-weight:700;margin-bottom:3px;}
+  .service-desc{font-size:12px;color:#6a8c72;line-height:1.4;}
+  .service-price{font-size:14px;font-weight:800;color:#E67E22;}
+
+  /* BOOKING FORM */
+  .form-section{margin:0 16px 14px;}
+  .form-label{font-size:12px;font-weight:600;color:#8ab89a;margin-bottom:6px;display:block;letter-spacing:0.5px;text-transform:uppercase;}
+  .form-input{width:100%;background:#1a2e1e;border:1px solid #2e4835;color:#e8f0eb;padding:13px 14px;border-radius:12px;font-size:14px;outline:none;transition:border 0.2s;}
+  .form-input:focus{border-color:#E67E22;}
+  .form-select{width:100%;background:#1a2e1e;border:1px solid #2e4835;color:#e8f0eb;padding:13px 14px;border-radius:12px;font-size:14px;outline:none;appearance:none;}
+  .date-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;}
+  .date-chip{background:#1a2e1e;border:1px solid #2e4835;color:#e8f0eb;padding:10px 4px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .date-chip.sel{background:#E67E22;border-color:#E67E22;color:#fff;}
+  .time-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;}
+  .time-chip{background:#1a2e1e;border:1px solid #2e4835;color:#e8f0eb;padding:10px;border-radius:10px;font-size:12px;font-weight:600;text-align:center;cursor:pointer;transition:all 0.2s;}
+  .time-chip.sel{background:#E67E22;border-color:#E67E22;color:#fff;}
+
+  /* PROFILE */
+  .profile-header{background:linear-gradient(135deg,#1e3a25,#2C3E50);padding:30px 20px 24px;text-align:center;margin-bottom:0;}
+  .profile-avatar{width:80px;height:80px;background:linear-gradient(135deg,#E67E22,#d35400);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;border:3px solid #E67E22;}
+  .profile-name{font-size:20px;font-weight:800;}
+  .profile-email{font-size:13px;color:#8ab89a;margin-top:4px;}
+  .stat-row{display:flex;gap:12px;padding:14px 16px;}
+  .stat-box{flex:1;background:#1a2e1e;border:1px solid #2e4835;border-radius:14px;padding:14px;text-align:center;}
+  .stat-num{font-size:22px;font-weight:800;color:#E67E22;}
+  .stat-label{font-size:11px;color:#6a8c72;margin-top:2px;}
+  .profile-menu-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border-bottom:1px solid #1e3225;cursor:pointer;}
+  .profile-menu-item:active{background:#1a2e1e;}
+  .pm-icon{font-size:20px;width:36px;text-align:center;}
+  .pm-text{flex:1;font-size:14px;font-weight:600;}
+  .pm-arrow{color:#6a8c72;font-size:16px;}
+
+  /* GALLERY */
+  .gallery-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;padding:0 16px;}
+  .gallery-item{border-radius:14px;overflow:hidden;aspect-ratio:1;cursor:pointer;position:relative;background:#1a2e1e;border:1px solid #2e4835;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;transition:all 0.2s;}
+  .gallery-item:active{transform:scale(0.97);border-color:#E67E22;}
+  .gallery-item .gi-emoji{font-size:36px;}
+  .gallery-item .gi-label{font-size:11px;color:#8ab89a;font-weight:600;text-align:center;padding:0 8px;}
+  .gallery-tag{position:absolute;top:8px;left:8px;background:#E67E22;color:#fff;font-size:9px;font-weight:700;padding:2px 7px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;}
+
+  /* REVIEWS */
+  .review-card{background:#1a2e1e;border:1px solid #2e4835;border-radius:16px;padding:16px;margin:0 16px 12px;}
+  .review-header{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+  .review-avatar{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#2C3E50,#E67E22);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+  .review-name{font-size:14px;font-weight:700;}
+  .review-date{font-size:11px;color:#6a8c72;}
+  .stars{color:#E67E22;font-size:14px;letter-spacing:1px;}
+  .review-text{font-size:13px;color:#9dbfa8;line-height:1.5;}
+  .rating-big{text-align:center;padding:24px 0;}
+  .rating-num{font-size:54px;font-weight:800;color:#E67E22;line-height:1;}
+  .rating-stars{font-size:24px;color:#E67E22;margin:6px 0;}
+  .rating-count{font-size:13px;color:#6a8c72;}
+
+  /* PAYMENTS */
+  .pay-card{background:linear-gradient(135deg,#2C3E50,#1a3a2a);border-radius:20px;padding:22px;margin:0 16px 16px;border:1px solid #3a5a45;}
+  .pay-card-num{font-size:16px;letter-spacing:4px;color:#e8f0eb;margin:16px 0 8px;}
+  .pay-card-info{display:flex;justify-content:space-between;font-size:12px;color:#8ab89a;}
+  .pay-method{display:flex;align-items:center;gap:14px;background:#1a2e1e;border:1px solid #2e4835;border-radius:14px;padding:14px;margin:0 16px 10px;cursor:pointer;transition:all 0.2s;}
+  .pay-method.active-pay{border-color:#E67E22;background:#1f3525;}
+  .pay-method:active{border-color:#E67E22;}
+  .pay-method-icon{font-size:24px;}
+  .pay-method-info{flex:1;}
+  .pay-method-name{font-size:14px;font-weight:700;}
+  .pay-method-sub{font-size:12px;color:#6a8c72;}
+  .pay-check{color:#E67E22;font-size:18px;}
+
+  /* MAP */
+  .map-placeholder{margin:16px;border-radius:20px;overflow:hidden;background:linear-gradient(160deg,#1e3a25,#0f2015);border:1px solid #2e4835;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;position:relative;}
+  .map-pin{font-size:40px;}
+  .map-label{font-size:13px;color:#8ab89a;font-weight:600;}
+  .map-grid{font-size:11px;color:#2e4835;position:absolute;top:0;left:0;right:0;bottom:0;background:repeating-linear-gradient(0deg,transparent,transparent 30px,#1e3228 30px,#1e3228 31px),repeating-linear-gradient(90deg,transparent,transparent 30px,#1e3228 30px,#1e3228 31px);opacity:0.5;}
+  .direction-btn{background:#2C3E50;border:none;color:#e8f0eb;padding:13px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s;}
+  .direction-btn:active{background:#E67E22;}
+  .directions-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:0 16px 12px;}
+  .info-row{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid #1e3225;}
+  .info-icon{font-size:20px;flex-shrink:0;margin-top:2px;}
+  .info-content{flex:1;}
+  .info-title{font-size:13px;font-weight:700;color:#e8f0eb;margin-bottom:2px;}
+  .info-sub{font-size:12px;color:#6a8c72;line-height:1.4;}
+
+  /* NOTIFICATIONS */
+  .notif-item{display:flex;gap:14px;padding:14px 16px;border-bottom:1px solid #1e3225;cursor:pointer;transition:background 0.2s;}
+  .notif-item:active{background:#1a2e1e;}
+  .notif-item.unread{background:#1c3020;}
+  .notif-dot{width:8px;height:8px;background:#E67E22;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .notif-dot.read{background:transparent;}
+  .notif-body{flex:1;}
+  .notif-title{font-size:13px;font-weight:700;margin-bottom:3px;}
+  .notif-text{font-size:12px;color:#8ab89a;line-height:1.4;}
+  .notif-time{font-size:11px;color:#4a6a52;margin-top:4px;}
+
+  /* CONFIRM MODAL */
+  .confirm-box{background:#1a2e1e;border:1px solid #E67E22;border-radius:20px;margin:24px 16px;padding:24px;text-align:center;}
+  .confirm-icon{font-size:48px;margin-bottom:12px;}
+  .confirm-title{font-size:18px;font-weight:800;margin-bottom:8px;}
+  .confirm-sub{font-size:13px;color:#8ab89a;line-height:1.5;margin-bottom:20px;}
+  .confirm-detail{background:#0f2015;border-radius:12px;padding:14px;margin-bottom:20px;text-align:left;}
+  .cd-row{display:flex;justify-content:space-between;padding:5px 0;font-size:13px;}
+  .cd-key{color:#6a8c72;}
+  .cd-val{font-weight:700;color:#e8f0eb;}
+
+  /* BADGE */
+  .badge{background:#E67E22;color:#fff;font-size:9px;font-weight:800;padding:2px 6px;border-radius:20px;margin-left:6px;}
+
+  /* PROGRESS */
+  .progress-bar{background:#1e3225;border-radius:20px;height:8px;margin:8px 0;}
+  .progress-fill{background:linear-gradient(90deg,#E67E22,#d35400);height:8px;border-radius:20px;}
+
+  /* CHIPS */
+  .chip-row{display:flex;gap:8px;flex-wrap:wrap;margin:0 16px 14px;}
+  .chip{background:#1a2e1e;border:1px solid #2e4835;color:#8ab89a;padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;transition:all 0.2s;}
+  .chip.active-chip{background:#E67E22;border-color:#E67E22;color:#fff;}
+  .chip:active{border-color:#E67E22;color:#E67E22;}
+
+  /* UPCOMING */
+  .appt-card{background:#1a2e1e;border:1px solid #2e4835;border-radius:16px;padding:16px;margin:0 16px 12px;cursor:pointer;transition:all 0.2s;}
+  .appt-card:active{border-color:#E67E22;}
+  .appt-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .appt-status{font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;letter-spacing:0.5px;text-transform:uppercase;}
+  .status-confirmed{background:rgba(46,204,113,0.15);color:#2ecc71;}
+  .status-pending{background:rgba(230,126,34,0.15);color:#E67E22;}
+  .appt-service{font-size:15px;font-weight:700;margin-bottom:6px;}
+  .appt-detail{font-size:12px;color:#6a8c72;display:flex;align-items:center;gap:6px;}
+</style>
+</head>
+<body>
+
+<!-- FIXED BOTTOM TAB BAR -->
+<div class="tabbar">
+  <button class="tab tabon" id="tab-home" onclick="showScreen('screen-home')"><span class="tab-icon">🏠</span><span class="tab-label">Home</span></button>
+  <button class="tab" id="tab-services" onclick="showScreen('screen-services')"><span class="tab-icon">🛠️</span><span class="tab-label">Services</span></button>
+  <button class="tab" id="tab-book" onclick="showScreen('screen-book')"><span class="tab-icon">📅</span><span class="tab-label">Book</span></button>
+  <button class="tab" id="tab-gallery" onclick="showScreen('screen-gallery')"><span class="tab-icon">📷</span><span class="tab-label">Gallery</span></button>
+  <button class="tab" id="tab-profile" onclick="showScreen('screen-profile')"><span class="tab-icon">👤</span><span class="tab-label">Profile</span></button>
+</div>
+
+<!-- ===== SCREEN: HOME ===== -->
+<div class="screen active" id="screen-home">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Monroe Construction</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-notifications')">🔔</button>
+  </div>
+
+  <div class="hero">
+    <div class="hero-tag">🌲 Premium Construction</div>
+    <h2>Build Your Vision With Expert Craftsmen</h2>
+    <p>From foundations to finishes — Monroe Construction delivers quality on every project.</p>
+    <button class="btn-primary" onclick="showScreen('screen-book')">Book a Consultation</button>
+  </div>
+
+  <div class="section-title">Quick Actions <span onclick="showScreen('screen-services')">See all →</span></div>
+  <div class="card-row">
+    <div class="mini-card" onclick="showScreen('screen-book')">
+      <div class="mini-card-icon">📅</div>
+      <div class="mini-card-title">Book Now</div>
+      <div class="mini-card-sub">Schedule today</div>
+    </div>
+    <div class="mini-card" onclick="showScreen('screen-services')">
+      <div class="mini-card-icon">🛠️</div>
+      <div class="mini-card-title">Services</div>
+      <div class="mini-card-sub">View menu</div>
+    </div>
+    <div class="mini-card" onclick="showScreen('screen-gallery')">
+      <div class="mini-card-icon">📷</div>
+      <div class="mini-card-title">Gallery</div>
+      <div class="mini-card-sub">Our work</div>
+    </div>
+    <div class="mini-card" onclick="showScreen('screen-map')">
+      <div class="mini-card-icon">📍</div>
+      <div class="mini-card-title">Find Us</div>
+      <div class="mini-card-sub">Get directions</div>
+    </div>
+  </div>
+
+  <div class="section-title">Upcoming Appointment</div>
+  <div class="appt-card" onclick="showScreen('screen-profile')">
+    <div class="appt-header">
+      <span class="appt-status status-confirmed">Confirmed ✓</span>
+      <span style="font-size:12px;color:#6a8c72;">Tomorrow</span>
+    </div>
+    <div class="appt-service">🏗️ Home Renovation Consult</div>
+    <div class="appt-detail">📅 June 15, 2025 &nbsp;|&nbsp; ⏰ 10:00 AM</div>
+    <div class="appt-detail" style="margin-top:4px;">👷 Mike Monroe &nbsp;|&nbsp; 📍 On-Site</div>
+  </div>
+
+  <div class="section-title">Popular Services <span onclick="showScreen('screen-services')">All →</span></div>
+  <div class="service-item" onclick="showScreen('screen-services')">
+    <div class="service-icon">🏠</div>
+    <div class="service-info">
+      <div class="service-name">Home Renovation</div>
+      <div class="service-desc">Full interior & exterior remodeling</div>
+    </div>
+    <div class="service-price">$2,500+</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-services')">
+    <div class="service-icon">🪵</div>
+    <div class="service-info">
+      <div class="service-name">Decking & Framing</div>
+      <div class="service-desc">Custom builds with premium lumber</div>
+    </div>
+    <div class="service-price">$800+</div>
+  </div>
+
+  <div class="section-title">Customer Reviews <span onclick="showScreen('screen-reviews')">All →</span></div>
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-avatar">👩</div>
+      <div>
+        <div class="review-name">Sarah L.</div>
+        <div class="stars">★★★★★</div>
+      </div>
+    </div>
+    <div class="review-text">"Monroe Construction transformed our basement into a stunning living space. Professional, on-time, and immaculate work!"</div>
+  </div>
+
+  <div class="section-title">Find Our Location</div>
+  <div class="map-placeholder" onclick="showScreen('screen-map')" style="cursor:pointer;">
+    <div class="map-grid"></div>
+    <div class="map-pin">📍</div>
+    <div class="map-label">Tap to open map</div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: SERVICES ===== -->
+<div class="screen" id="screen-services">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Service Menu</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-notifications')">🔔</button>
+  </div>
+
+  <div class="chip-row">
+    <div class="chip active-chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">All</div>
+    <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">Renovation</div>
+    <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">Outdoor</div>
+    <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">Commercial</div>
+  </div>
+
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🏠</div>
+    <div class="service-info">
+      <div class="service-name">Home Renovation</div>
+      <div class="service-desc">Full interior & exterior remodeling projects</div>
+    </div>
+    <div class="service-price">$2,500+</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🪵</div>
+    <div class="service-info">
+      <div class="service-name">Decking & Framing</div>
+      <div class="service-desc">Custom builds with premium lumber</div>
+    </div>
+    <div class="service-price">$800+</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🏗️</div>
+    <div class="service-info">
+      <div class="service-name">New Construction</div>
+      <div class="service-desc">Ground-up residential & commercial builds</div>
+    </div>
+    <div class="service-price">Custom</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🛁</div>
+    <div class="service-info">
+      <div class="service-name">Bathroom Remodel</div>
+      <div class="service-desc">Tile, fixtures, vanity, full or partial</div>
+    </div>
+    <div class="service-price">$1,200+</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🍳</div>
+    <div class="service-info">
+      <div class="service-name">Kitchen Renovation</div>
+      <div class="service-desc">Cabinets, countertops, full remodels</div>
+    </div>
+    <div class="service-price">$3,000+</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🌳</div>
+    <div class="service-info">
+      <div class="service-name">Landscaping & Hardscape</div>
+      <div class="service-desc">Patios, walkways, retaining walls</div>
+    </div>
+    <div class="service-price">$600+</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🏢</div>
+    <div class="service-info">
+      <div class="service-name">Commercial Fit-Out</div>
+      <div class="service-desc">Office & retail space construction</div>
+    </div>
+    <div class="service-price">Custom</div>
+  </div>
+  <div class="service-item" onclick="showScreen('screen-book')">
+    <div class="service-icon">🔧</div>
+    <div class="service-info">
+      <div class="service-name">Repairs & Maintenance</div>
+      <div class="service-desc">Structural repairs and upkeep services</div>
+    </div>
+    <div class="service-price">$150/hr</div>
+  </div>
+
+  <div style="padding:0 16px 16px;">
+    <button class="btn-primary" style="width:100%;padding:15px;" onclick="showScreen('screen-book')">📅 Book a Service</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: BOOK ===== -->
+<div class="screen" id="screen-book">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Online Booking</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-home')">✕</button>
+  </div>
+
+  <div class="section-title" style="margin-top:16px;">Select Service</div>
+  <div class="form-section">
+    <select class="form-select">
+      <option>🏠 Home Renovation</option>
+      <option>🪵 Decking & Framing</option>
+      <option>🏗️ New Construction</option>
+      <option>🛁 Bathroom Remodel</option>
+      <option>🍳 Kitchen Renovation</option>
+      <option>🔧 Repairs & Maintenance</option>
+    </select>
+  </div>
+
+  <div class="section-title">Choose a Date</div>
+  <div class="form-section">
+    <div class="date-grid">
+      <div class="date-chip" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#6a8c72;">MON</div><div>9</div></div>
+      <div class="date-chip sel" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#fff;">TUE</div><div>10</div></div>
+      <div class="date-chip" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#6a8c72;">WED</div><div>11</div></div>
+      <div class="date-chip" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#6a8c72;">THU</div><div>12</div></div>
+      <div class="date-chip" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#6a8c72;">FRI</div><div>13</div></div>
+      <div class="date-chip" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#6a8c72;">SAT</div><div>14</div></div>
+      <div class="date-chip" onclick="document.querySelectorAll('.date-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')"><div style="font-size:10px;color:#6a8c72;">SUN</div><div>15</div></div>
+    </div>
+  </div>
+
+  <div class="section-title">Select Time</div>
+  <div class="form-section">
+    <div class="time-grid">
+      <div class="time-chip" onclick="document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">8:00 AM</div>
+      <div class="time-chip sel" onclick="document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">10:00 AM</div>
+      <div class="time-chip" onclick="document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">12:00 PM</div>
+      <div class="time-chip" onclick="document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">2:00 PM</div>
+      <div class="time-chip" onclick="document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">4:00 PM</div>
+      <div class="time-chip" onclick="document.querySelectorAll('.time-chip').forEach(c=>c.classList.remove('sel'));this.classList.add('sel')">6:00 PM</div>
+    </div>
+  </div>
+
+  <div class="section-title">Your Details</div>
+  <div class="form-section">
+    <label class="form-label">Full Name</label>
+    <input class="form-input" type="text" placeholder="James Rivera" value="James Rivera" style="margin-bottom:10px;">
+    <label class="form-label">Phone Number</label>
+    <input class="form-input" type="tel" placeholder="(555) 000-0000" value="(555) 482-7193" style="margin-bottom:10px;">
+    <label class="form-label">Project Address</label>
+    <input class="form-input" type="text" placeholder="123 Forest Lane, Monroe, WA" value="48 Timber Ridge Rd, Monroe, WA">
+  </div>
+
+  <div class="form-section" style="margin-top:10px;">
+    <label class="form-label">Notes for the Team</label>
+    <textarea class="form-input" rows="3" style="resize:none;" placeholder="Describe your project or any special requirements...">Need full basement renovation with new flooring and drywall.</textarea>
+  </div>
+
+  <div style="padding:0 16px 16px;margin-top:10px;">
+    <button class="btn-primary" style="width:100%;padding:15px;" onclick="showScreen('screen-confirm')">Confirm Booking →</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: CONFIRM ===== -->
+<div class="screen" id="screen-confirm">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Booking Confirmed</div>
+    </div>
+  </div>
+
+  <div class="confirm-box" style="margin-top:24px;">
+    <div class="confirm-icon">🎉</div>
+    <div class="confirm-title">You're All Set!</div>
+    <div class="confirm-sub">Your appointment has been confirmed. We'll send you a reminder 24 hours before.</div>
+    <div class="confirm-detail">
+      <div class="cd-row"><span class="cd-key">Service</span><span class="cd-val">Home Renovation</span></div>
+      <div class="cd-row"><span class="cd-key">Date</span><span class="cd-val">Tuesday, June 10</span></div>
+      <div class="cd-row"><span class="cd-key">Time</span><span class="cd-val">10:00 AM</span></div>
+      <div class="cd-row"><span class="cd-key">Technician</span><span class="cd-val">Mike Monroe</span></div>
+      <div class="cd-row"><span class="cd-key">Booking ID</span><span class="cd-val">#MB-20480</span></div>
+    </div>
+    <button class="btn-primary" style="width:100%;padding:14px;margin-bottom:10px;" onclick="showScreen('screen-payments')">💳 Pay Deposit Now</button>
+    <button class="btn-secondary" style="width:100%;padding:12px;" onclick="showScreen('screen-home')">Back to Home</button>
+  </div>
+
+  <div class="section-title">What Happens Next?</div>
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+      <span style="font-size:20px;">📱</span>
+      <div><div style="font-size:13px;font-weight:700;">Confirmation SMS Sent</div><div style="font-size:12px;color:#6a8c72;">Check your messages</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:12px;margin-bottom:12px;">
+      <span style="font-size:20px;">🔔</span>
+      <div><div style="font-size:13px;font-weight:700;">24hr Reminder</div><div style="font-size:12px;color:#6a8c72;">We'll remind you before your appointment</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:60%;"></div></div>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:12px;">
+      <span style="font-size:20px;">👷</span>
+      <div><div style="font-size:13px;font-weight:700;">Team Arrival</div><div style="font-size:12px;color:#6a8c72;">Our crew arrives at your location</div></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:30%;"></div></div>
+  </div>
+</div>
+
+<!-- ===== SCREEN: GALLERY ===== -->
+<div class="screen" id="screen-gallery">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Photo Gallery</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-notifications')">🔔</button>
+  </div>
+
+  <div class="chip-row">
+    <div class="chip active-chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">All</div>
+    <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">Renovations</div>
+    <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">Outdoor</div>
+    <div class="chip" onclick="this.parentElement.querySelectorAll('.chip').forEach(c=>c.classList.remove('active-chip'));this.classList.add('active-chip')">Commercial</div>
+  </div>
+
+  <div class="gallery-grid">
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">BEFORE / AFTER</div>
+      <div class="gi-emoji">🏠</div>
+      <div class="gi-label">Cedar Ridge Home Reno</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">NEW BUILD</div>
+      <div class="gi-emoji">🏗️</div>
+      <div class="gi-label">Elmwood Residence</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">FEATURED</div>
+      <div class="gi-emoji">🪵</div>
+      <div class="gi-label">Timber Deck Build</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">REMODEL</div>
+      <div class="gi-emoji">🍳</div>
+      <div class="gi-label">Maple Kitchen Overhaul</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">REMODEL</div>
+      <div class="gi-emoji">🛁</div>
+      <div class="gi-label">Birchwood Bath Spa</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">OUTDOOR</div>
+      <div class="gi-emoji">🌳</div>
+      <div class="gi-label">Forest Patio & Walkway</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">COMMERCIAL</div>
+      <div class="gi-emoji">🏢</div>
+      <div class="gi-label">Monroe Office Fit-Out</div>
+    </div>
+    <div class="gallery-item" onclick="showScreen('screen-gallery-detail')">
+      <div class="gallery-tag">REPAIR</div>
+      <div class="gi-emoji">🔧</div>
+      <div class="gi-label">Structural Restoration</div>
+    </div>
+  </div>
+
+  <div style="padding:16px;">
+    <button class="btn-primary" style="width:100%;padding:14px;" onclick="showScreen('screen-book')">📅 Book This Style</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: GALLERY DETAIL ===== -->
+<div class="screen" id="screen-gallery-detail">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Project Detail</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-gallery')">←</button>
+  </div>
+
+  <div style="background:linear-gradient(135deg,#1e3a25,#2C3E50);margin:16px;border-radius:20px;height:200px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;border:1px solid #2e4835;">
+    <span style="font-size:60px;">🏠</span>
+    <span style="font-size:13px;color:#8ab89a;">Cedar Ridge Home Renovation</span>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;">
+      <div>
+        <div style="font-size:16px;font-weight:800;margin-bottom:4px;">Cedar Ridge Home Reno</div>
+        <div style="font-size:12px;color:#8ab89a;">Completed May 2025</div>
+      </div>
+      <span style="background:rgba(46,204,113,0.15);color:#2ecc71;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">✓ Completed</span>
+    </div>
+    <div style="font-size:13px;color:#9dbfa8;line-height:1.6;margin-bottom:14px;">Full home renovation including new framing, insulation, drywall, flooring, kitchen and two bathroom remodels. Project completed on time and under budget.</div>
+    <div style="display:flex;gap:16px;">
+      <div><div style="font-size:11px;color:#6a8c72;">DURATION</div><div style="font-size:14px;font-weight:700;">8 weeks</div></div>
+      <div><div style="font-size:11px;color:#6a8c72;">BUDGET</div><div style="font-size:14px;font-weight:700;">$42,000</div></div>
+      <div><div style="font-size:11px;color:#6a8c72;">TEAM</div><div style="font-size:14px;font-weight:700;">6 crew</div></div>
+    </div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-avatar">👨</div>
+      <div>
+        <div class="review-name">Tom & Karen R.</div>
+        <div class="stars">★★★★★</div>
+      </div>
+    </div>
+    <div class="review-text">"Monroe's team turned our outdated house into a dream home. Couldn't be happier with the craftsmanship and attention to detail."</div>
+  </div>
+
+  <div style="padding:0 16px 16px;display:flex;gap:10px;">
+    <button class="btn-primary" style="flex:1;padding:14px;" onclick="showScreen('screen-book')">Book Similar</button>
+    <button class="btn-secondary" style="flex:1;padding:12px;" onclick="showScreen('screen-gallery')">← Gallery</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: PROFILE ===== -->
+<div class="screen" id="screen-profile">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">My Profile</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-notifications')">🔔</button>
+  </div>
+
+  <div class="profile-header">
+    <div class="profile-avatar">👷</div>
+    <div class="profile-name">James Rivera</div>
+    <div class="profile-email">james.rivera@email.com</div>
+    <div style="margin-top:12px;font-size:12px;background:rgba(230,126,34,0.15);color:#E67E22;padding:4px 14px;border-radius:20px;display:inline-block;font-weight:700;">⭐ Premium Member</div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="stat-num">7</div>
+      <div class="stat-label">Projects</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">4</div>
+      <div class="stat-label">Reviews</div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-num">$18k</div>
+      <div class="stat-label">Invested</div>
+    </div>
+  </div>
+
+  <div class="section-title">My Appointments</div>
+  <div class="appt-card" onclick="showScreen('screen-confirm')">
+    <div class="appt-header">
+      <span class="appt-status status-confirmed">Confirmed ✓</span>
+      <span style="font-size:12px;color:#6a8c72;">Jun 10</span>
+    </div>
+    <div class="appt-service">🏠 Home Renovation Consult</div>
+    <div class="appt-detail">⏰ 10:00 AM &nbsp;|&nbsp; 👷 Mike Monroe</div>
+  </div>
+  <div class="appt-card" onclick="showScreen('screen-confirm')">
+    <div class="appt-header">
+      <span class="appt-status status-pending">Pending</span>
+      <span style="font-size:12px;color:#6a8c72;">Jun 20</span>
+    </div>
+    <div class="appt-service">🪵 Deck Framing Estimate</div>
+    <div class="appt-detail">⏰ 2:00 PM &nbsp;|&nbsp; 👷 Sarah Chen</div>
+  </div>
+
+  <div class="section-title">Account</div>
+  <div class="profile-menu-item" onclick="showScreen('screen-payments')">
+    <span class="pm-icon">💳</span>
+    <span class="pm-text">Payment Methods</span>
+    <span class="pm-arrow">›</span>
+  </div>
+  <div class="profile-menu-item" onclick="showScreen('screen-reviews')">
+    <span class="pm-icon">⭐</span>
+    <span class="pm-text">My Reviews</span>
+    <span class="pm-arrow">›</span>
+  </div>
+  <div class="profile-menu-item" onclick="showScreen('screen-notifications')">
+    <span class="pm-icon">🔔</span>
+    <span class="pm-text">Notifications<span class="badge">3</span></span>
+    <span class="pm-arrow">›</span>
+  </div>
+  <div class="profile-menu-item" onclick="showScreen('screen-map')">
+    <span class="pm-icon">📍</span>
+    <span class="pm-text">Saved Addresses</span>
+    <span class="pm-arrow">›</span>
+  </div>
+  <div class="profile-menu-item" onclick="showScreen('screen-home')">
+    <span class="pm-icon">⚙️</span>
+    <span class="pm-text">Settings</span>
+    <span class="pm-arrow">›</span>
+  </div>
+  <div style="padding:16px;margin-top:4px;">
+    <button class="btn-secondary" style="width:100%;padding:13px;color:#ff6b6b;border-color:#ff6b6b;" onclick="showScreen('screen-home')">Sign Out</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: PAYMENTS ===== -->
+<div class="screen" id="screen-payments">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Payments</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-profile')">←</button>
+  </div>
+
+  <div class="pay-card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:13px;font-weight:700;color:#8ab89a;text-transform:uppercase;letter-spacing:1px;">Visa Credit</span>
+      <span style="font-size:22px;">💳</span>
+    </div>
+    <div class="pay-card-num">•••• •••• •••• 4821</div>
+    <div class="pay-card-info">
+      <span>James Rivera</span>
+      <span>08/27</span>
+    </div>
+  </div>
+
+  <div class="section-title">Payment Methods</div>
+  <div class="pay-method active-pay">
+    <span class="pay-method-icon">💳</span>
+    <div class="pay-method-info">
+      <div class="pay-method-name">Visa •••• 4821</div>
+      <div class="pay-method-sub">Expires 08/27 · Primary</div>
+    </div>
+    <span class="pay-check">✓</span>
+  </div>
+  <div class="pay-method" onclick="this.classList.toggle('active-pay')">
+    <span class="pay-method-icon">🏦</span>
+    <div class="pay-method-info">
+      <div class="pay-method-name">Bank Transfer</div>
+      <div class="pay-method-sub">Checking •••• 9240</div>
+    </div>
+    <span style="color:#6a8c72;font-size:18px;">○</span>
+  </div>
+  <div class="pay-method" onclick="this.classList.toggle('active-pay')">
+    <span class="pay-method-icon">📱</span>
+    <div class="pay-method-info">
+      <div class="pay-method-name">Apple Pay</div>
+      <div class="pay-method-sub">Touch ID enabled</div>
+    </div>
+    <span style="color:#6a8c72;font-size:18px;">○</span>
+  </div>
+
+  <div style="padding:0 16px;margin-top:4px;">
+    <button class="btn-secondary" style="width:100%;padding:13px;">+ Add Payment Method</button>
+  </div>
+
+  <div class="section-title">Transaction History</div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e3225;">
+      <div><div style="font-size:13px;font-weight:700;">Deposit — Home Reno</div><div style="font-size:11px;color:#6a8c72;">Jun 8, 2025</div></div>
+      <div style="color:#E67E22;font-weight:800;">-$500</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1e3225;">
+      <div><div style="font-size:13px;font-weight:700;">Final — Deck Build</div><div style="font-size:11px;color:#6a8c72;">Apr 22, 2025</div></div>
+      <div style="color:#E67E22;font-weight:800;">-$1,200</div>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;">
+      <div><div style="font-size:13px;font-weight:700;">Consultation Fee</div><div style="font-size:11px;color:#6a8c72;">Mar 10, 2025</div></div>
+      <div style="color:#E67E22;font-weight:800;">-$150</div>
+    </div>
+  </div>
+
+  <div style="padding:0 16px 16px;">
+    <button class="btn-primary" style="width:100%;padding:14px;" onclick="showScreen('screen-confirm')">💰 Pay Deposit Now</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: REVIEWS ===== -->
+<div class="screen" id="screen-reviews">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Reviews & Ratings</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-profile')">←</button>
+  </div>
+
+  <div class="rating-big">
+    <div class="rating-num">4.9</div>
+    <div class="rating-stars">★★★★★</div>
+    <div class="rating-count">Based on 142 reviews</div>
+  </div>
+
+  <div class="card" style="margin-bottom:16px;">
+    <div style="margin-bottom:10px;font-size:13px;font-weight:700;color:#8ab89a;">Rating Breakdown</div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-size:12px;color:#E67E22;min-width:14px;">5</span><div class="progress-bar" style="flex:1;margin:0;"><div class="progress-fill" style="width:88%;"></div></div><span style="font-size:12px;color:#6a8c72;">88%</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-size:12px;color:#E67E22;min-width:14px;">4</span><div class="progress-bar" style="flex:1;margin:0;"><div class="progress-fill" style="width:9%;"></div></div><span style="font-size:12px;color:#6a8c72;">9%</span></div>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;"><span style="font-size:12px;color:#E67E22;min-width:14px;">3</span><div class="progress-bar" style="flex:1;margin:0;"><div class="progress-fill" style="width:3%;"></div></div><span style="font-size:12px;color:#6a8c72;">3%</span></div>
+    <div style="display:flex;align-items:center;gap:10px;"><span style="font-size:12px;color:#E67E22;min-width:14px;">2</span><div class="progress-bar" style="flex:1;margin:0;"><div class="progress-fill" style="width:0%;"></div></div><span style="font-size:12px;color:#6a8c72;">0%</span></div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-avatar">👩</div>
+      <div>
+        <div class="review-name">Sarah L.</div>
+        <div class="review-date">June 2025</div>
+      </div>
+      <div style="margin-left:auto;"><div class="stars">★★★★★</div></div>
+    </div>
+    <div class="review-text">"Monroe Construction transformed our basement into a stunning living space. Professional, on-time, and immaculate work throughout the project!"</div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-avatar">👨</div>
+      <div>
+        <div class="review-name">Tom & Karen R.</div>
+        <div class="review-date">May 2025</div>
+      </div>
+      <div style="margin-left:auto;"><div class="stars">★★★★★</div></div>
+    </div>
+    <div class="review-text">"Our dream kitchen became a reality. Monroe's team guided us through every decision. The craftsmanship is next level."</div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-avatar">🧑</div>
+      <div>
+        <div class="review-name">Marcus H.</div>
+        <div class="review-date">April 2025</div>
+      </div>
+      <div style="margin-left:auto;"><div class="stars">★★★★★</div></div>
+    </div>
+    <div class="review-text">"Hired Monroe for a full deck and patio build. On budget, two days early, and the work is outstanding. Already referring to neighbors."</div>
+  </div>
+
+  <div class="review-card">
+    <div class="review-header">
+      <div class="review-avatar">👩</div>
+      <div>
+        <div class="review-name">Priya M.</div>
+        <div class="review-date">March 2025</div>
+      </div>
+      <div style="margin-left:auto;"><div class="stars">★★★★☆</div></div>
+    </div>
+    <div class="review-text">"Great quality work on our bathroom remodel. Minor delay at the start but once underway, everything ran perfectly. Very happy with the result."</div>
+  </div>
+
+  <div style="padding:0 16px 16px;">
+    <button class="btn-primary" style="width:100%;padding:14px;" onclick="showScreen('screen-book')">📅 Book & Experience It</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: MAP ===== -->
+<div class="screen" id="screen-map">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Maps & Directions</div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-home')">←</button>
+  </div>
+
+  <div class="map-placeholder" style="height:240px;margin-top:16px;cursor:default;">
+    <div class="map-grid"></div>
+    <div class="map-pin">📍</div>
+    <div style="font-size:16px;font-weight:800;color:#e8f0eb;position:relative;">Monroe Construction HQ</div>
+    <div class="map-label" style="position:relative;">142 Forest Ridge Dr, Monroe, WA</div>
+  </div>
+
+  <div class="directions-grid">
+    <button class="direction-btn" onclick="showScreen('screen-map')">🚗 Drive</button>
+    <button class="direction-btn" onclick="showScreen('screen-map')">🚶 Walk</button>
+    <button class="direction-btn" onclick="showScreen('screen-map')">🚌 Transit</button>
+    <button class="direction-btn" onclick="showScreen('screen-map')">📋 Copy Address</button>
+  </div>
+
+  <div class="section-title">Location Info</div>
+  <div class="info-row">
+    <span class="info-icon">📍</span>
+    <div class="info-content">
+      <div class="info-title">Address</div>
+      <div class="info-sub">142 Forest Ridge Drive, Monroe, WA 98272</div>
+    </div>
+  </div>
+  <div class="info-row">
+    <span class="info-icon">📞</span>
+    <div class="info-content">
+      <div class="info-title">Phone</div>
+      <div class="info-sub">(360) 794-5500</div>
+    </div>
+  </div>
+  <div class="info-row">
+    <span class="info-icon">🕐</span>
+    <div class="info-content">
+      <div class="info-title">Business Hours</div>
+      <div class="info-sub">Mon – Fri: 7:00 AM – 6:00 PM<br>Sat: 8:00 AM – 4:00 PM<br>Sun: Closed</div>
+    </div>
+  </div>
+  <div class="info-row">
+    <span class="info-icon">✉️</span>
+    <div class="info-content">
+      <div class="info-title">Email</div>
+      <div class="info-sub">hello@monroebuildhub.com</div>
+    </div>
+  </div>
+
+  <div style="padding:16px;">
+    <button class="btn-primary" style="width:100%;padding:14px;" onclick="showScreen('screen-book')">📅 Book an On-Site Visit</button>
+  </div>
+</div>
+
+<!-- ===== SCREEN: NOTIFICATIONS ===== -->
+<div class="screen" id="screen-notifications">
+  <div class="top-bar">
+    <div>
+      <div class="wordmark">Monroe <span>Build Hub</span></div>
+      <div class="top-bar-sub">Notifications<span class="badge">3</span></div>
+    </div>
+    <button class="notif-btn" onclick="showScreen('screen-home')">←</button>
+  </div>
+
+  <div style="padding:10px 16px 0;display:flex;justify-content:space-between;align-items:center;">
+    <span style="font-size:12px;color:#8ab89a;font-weight:600;">TODAY</span>
+    <span style="font-size:12px;color:#E67E22;font-weight:600;cursor:pointer;">Mark all read</span>
+  </div>
+
+  <div class="notif-item unread" onclick="showScreen('screen-confirm')">
+    <div class="notif-dot"></div>
+    <div class="notif-body">
+      <div class="notif-title">🔔 Appointment Reminder</div>
+      <div class="notif-text">Your Home Renovation Consult is tomorrow at 10:00 AM with Mike Monroe. Don't forget!</div>
+      <div class="notif-time">Just now</div>
+    </div>
+  </div>
+  <div class="notif-item unread" onclick="showScreen('screen-payments')">
+    <div class="notif-dot"></div>
+    <div class="notif-body">
+      <div class="notif-title">💳 Payment Due</div>
+      <div class="notif-text">Deposit of $500 for your Home Renovation booking is due before June 10th.</div>
+      <div class="notif-time">2 hours ago</div>
+    </div>
+  </div>
+  <div class="notif-item unread" onclick="showScreen('screen-reviews')">
+    <div class="notif-dot"></div>
+    <div class="notif-body">
+      <div class="notif-title">⭐ Review Request</div>
+      <div class="notif-text">How did your Deck Framing project go? Leave a review for your crew and help others!</div>
+      <div class="notif-time">5 hours ago</div>
+    </div>
+  </div>
+
+  <div style="padding:10px 16px 0;">
+    <span style="font-size:12px;color:#8ab89a;font-weight:600;">EARLIER</span>
+  </div>
+
+  <div class="notif-item" onclick="showScreen('screen-gallery')">
+    <div class="notif-dot read"></div>
+    <div class="notif-body">
+      <div class="notif-title">📷 New Photos Added</div>
+      <div class="notif-text">We've added 6 new photos to our project gallery. Check out our latest work!</div>
+      <div class="notif-time">Yesterday</div>
+    </div>
+  </div>
+  <div class="notif-item" onclick="showScreen('screen-services')">
+    <div class="notif-dot read"></div>
+    <div class="notif-body">
+      <div class="notif-title">🛠️ New Service Available</div>
+      <div class="notif-text">We now offer Commercial Fit-Out services! Perfect for office and retail spaces.</div>
+      <div class="notif-time">2 days ago</div>
+    </div>
+  </div>
+  <div class="notif-item" onclick="showScreen('screen-book')">
+    <div class="notif-dot read"></div>
+    <div class="notif-body">
+      <div class="notif-title">🌲 Summer Special Offer</div>
+      <div class="notif-text">Book any outdoor project this month and receive 10% off your total quote!</div>
+      <div class="notif-time">3 days ago</div>
+    </div>
+  </div>
+</div>
+
+<script>
+function showScreen(id){
+  var s=document.querySelectorAll('.screen');
+  for(var i=0;i<s.length;i++){s[i].classList.remove('active');}
+  var el=document.getElementById(id);
+  if(el){el.classList.add('active');}
+  var t=document.querySelectorAll('.tab');
+  for(var j=0;j<t.length;j++){t[j].classList.remove('tabon');}
+  var bt=document.getElementById('tab-'+id.replace('screen-',''));
+  if(bt){bt.classList.add('tabon');}
+  window.scrollTo(0,0);
+}
+</script>
+<style>.screen{display:none!important}.screen.active{display:block!important}.tab.tabon{opacity:1!important;filter:brightness(1.4)}</style>
+<script>
+(function(){
+  function showScreen(id){
+    if(id && id.indexOf('screen-')!==0){id='screen-'+id;}
+    var s=document.querySelectorAll('.screen');
+    for(var i=0;i<s.length;i++){s[i].classList.remove('active');}
+    var el=document.getElementById(id)||document.querySelector('.screen[data-screen="'+id.replace('screen-','')+'"]');
+    if(el){el.classList.add('active');}
+    var t=document.querySelectorAll('.tab');
+    for(var j=0;j<t.length;j++){t[j].classList.remove('tabon');}
+    var bt=document.getElementById('tab-'+id.replace('screen-',''));
+    if(bt){bt.classList.add('tabon');}
+    window.scrollTo(0,0);
+  }
+  window.showScreen=showScreen;
+  document.addEventListener('DOMContentLoaded',function(){
+    // Make sure at least one screen is visible on load.
+    var screens=document.querySelectorAll('.screen');
+    if(screens.length){
+      var anyActive=document.querySelector('.screen.active');
+      if(!anyActive){screens[0].classList.add('active');}
+    }
+    // Backup: wire any element that references showScreen via data-nav too.
+    var navs=document.querySelectorAll('[data-nav]');
+    for(var k=0;k<navs.length;k++){
+      (function(n){n.addEventListener('click',function(){showScreen(n.getAttribute('data-nav'));});})(navs[k]);
+    }
+  });
+})();
+</script></body>
+</html>
